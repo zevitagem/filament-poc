@@ -9,10 +9,18 @@ RUN apt-get update && apt-get install -y \
     tzdata
 
 # Atualizar e instalar pacotes necessários
-RUN apt-get install -y software-properties-common \
+RUN apt-get update && apt-get install -y software-properties-common \
     libzip-dev \
     unzip \
-    git
+    git \
+    libicu-dev \
+    libxml2-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    libwebp-dev \
+    libxpm-dev \
+    libonig-dev
 
 # Instalar o Node.js e o NPM
 RUN apt-get install -y nodejs npm && \
@@ -20,8 +28,12 @@ RUN apt-get install -y nodejs npm && \
     n lts && \
     npm install -g npm@latest
 
-# Instalar extensões
-RUN docker-php-ext-install pdo_mysql zip
+# Instalar extensões PHP
+RUN docker-php-ext-install pdo_mysql zip intl mbstring xml bcmath
+
+# Instalar extensão GD
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp --with-xpm \
+    && docker-php-ext-install gd
 
 # Instalar Composer globalmente
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
